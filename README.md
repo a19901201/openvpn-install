@@ -1,7 +1,7 @@
 # openvpn-install
 
-![Test](https://github.com/a19901201/openvpn-install/workflows/Test/badge.svg)
-![Lint](https://github.com/a19901201/openvpn-install/workflows/Lint/badge.svg)
+![Test](https://github.com/angristan/openvpn-install/workflows/Test/badge.svg)
+![Lint](https://github.com/angristan/openvpn-install/workflows/Lint/badge.svg)
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/angristan)
 
 適用於 Debian、Ubuntu、Fedora、CentOS、Arch Linux、Oracle Linux、Rocky Linux 和 AlmaLinux 的 OpenVPN 安裝程序。
