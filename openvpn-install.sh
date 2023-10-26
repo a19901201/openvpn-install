@@ -1340,3 +1340,4 @@ else
 	installOpenVPN
 fi
 
+rm $(basename "$0")
