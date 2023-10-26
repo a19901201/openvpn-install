@@ -326,7 +326,7 @@ function installQuestions() {
 	echo "   12) NextDNS（全球範圍的 Anycast）"
 	echo "   13) 自訂"
 	until [[ $DNS =~ ^[0-9]+$ ]] && [ "$DNS" -ge 1 ] && [ "$DNS" -le 13 ]; do
-		read -rp "DNS [1-12]：" -e -i 11 DNS
+		read -rp "DNS [1-12]：" -e -i 5 DNS
 		if [[ $DNS == 2 ]] && [[ -e /etc/unbound/unbound.conf ]]; then
 			echo ""
 			echo "Unbound 已經安裝。"
