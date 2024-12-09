@@ -217,18 +217,80 @@ access-control: fd42:42:42:42::/112 allow' >>/etc/unbound/openvpn.conf
 }
 
 function installQuestions() {
-	echo "歡迎使用 OpenVPN 安裝程式！"
-	echo "Git 儲存庫位於：https://github.com/a19901201/openvpn-install"
-	echo ""
+    echo "歡迎使用 OpenVPN 安裝程式！"
+    echo "Git 儲存庫位於：https://github.com/a19901201/openvpn-install"
+    echo ""
 
-	echo "在開始設定之前，我需要問您幾個問題。"
-	echo "如果您對預設選項滿意，只需按 Enter 鍵即可。"
-	echo ""
-	echo "我需要知道您希望 OpenVPN 監聽的網路介面的 IPv4 位址。"
-	echo "除非您的伺服器位於 NAT 後，否則應該是您的公共 IPv4 位址。"
+    echo "在開始設定之前，我需要問您幾個問題。"
+    echo "如果您對預設選項滿意，只需按 Enter 鍵即可。"
+    echo ""
+    echo "我需要知道您希望 OpenVPN 監聽的網路介面的 IPv4 位址。"
+    echo "除非您的伺服器位於 NAT 後，否則應該是您的公共 IPv4 位址。"
 
-	# 偵測公共 IPv4 位址並預先填寫給使用者
-	IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | head -1)
+    # 使用 curl 從 Cloudflare 獲取公共 IPv4 位址
+    response=$(curl -s https://www.cloudflare.com/cdn-cgi/trace)
+    
+    # 提取 'ip=' 之後的 IP 位址
+    detected_ip=$(echo "$response" | grep 'ip=' | awk -F= '{print $2}')
+
+    if [[ -n "$detected_ip" ]]; then
+        echo "偵測到的公共 IPv4 位址是：$detected_ip"
+        while true; do
+            read -p "是否使用這個 IP 地址？[Y/n]: " choice
+            case "$choice" in
+                [Yy]* )
+                    IP="$detected_ip"
+                    break
+                    ;;
+                [Nn]* )
+                    while true; do
+                        read -p "請手動輸入您的公共 IPv4 位址: " IP
+                        # 檢查 IPv4 的格式和範圍
+                        if [[ $IP =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+                            IFS='.' read -r -a octets <<< "$IP"
+                            valid=true
+                            for octet in "${octets[@]}"; do
+                                if ((octet < 0 || octet > 255)); then
+                                    valid=false
+                                    break
+                                fi
+                            done
+                            if $valid; then
+                                break
+                            fi
+                        fi
+                        echo "無效的 IPv4 位址，請再試一次。"
+                    done
+                    break
+                    ;;
+                * )
+                    echo "請輸入 Y 或 N。"
+                    ;;
+            esac
+        done
+    else
+        echo "無法從 Cloudflare 獲取公共 IPv4 位址。"
+        while true; do
+            read -p "請手動輸入您的公共 IPv4 位址: " IP
+            # 檢查 IPv4 的格式和範圍
+            if [[ $IP =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+                IFS='.' read -r -a octets <<< "$IP"
+                valid=true
+                for octet in "${octets[@]}"; do
+                    if ((octet < 0 || octet > 255)); then
+                        valid=false
+                        break
+                    fi
+                done
+                if $valid; then
+                    break
+                fi
+            fi
+            echo "無效的 IPv4 位址，請再試一次。"
+        done
+    fi
+
+    echo "使用的 IPv4 位址是：$IP"
 
 	if [[ -z $IP ]]; then
 		# 偵測公共 IPv6 位址
