@@ -228,7 +228,7 @@ function installQuestions() {
     echo "除非您的伺服器位於 NAT 後，否則應該是您的公共 IPv4 位址。"
 
     # 使用 curl 從 Cloudflare 獲取公共 IPv4 位址
-    response=$(curl -s https://www.cloudflare.com/cdn-cgi/trace)
+    response=$(curl -4 -s https://www.cloudflare.com/cdn-cgi/trace)
     
     # 提取 'ip=' 之後的 IP 位址
     detected_ip=$(echo "$response" | grep 'ip=' | awk -F= '{print $2}')
